@@ -50,11 +50,11 @@ public class TradeSimple implements  ITradeLogic{
 
 	private void sell(double current){
 
-		double sellRate = current;
+		int sellRate = (int)current;
 		if (current > lastTradePrice * ((100 + SELL) / 100)){
-			sellRate = current * ((100 + SELL) / 100);
+			sellRate = (int)(current * ((100 + SELL) / 100));
 		} else {
-			sellRate = lastTradePrice * ((100 + SELL) / 100);
+			sellRate = (int)(lastTradePrice * ((100 + SELL) / 100));
 		}
 		double sellAmount = lastTradeAmount;
 		String result = CoinCheckClient.postSellRequest(String.valueOf(sellRate), String.valueOf(sellAmount));
