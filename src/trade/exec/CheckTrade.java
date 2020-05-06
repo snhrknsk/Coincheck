@@ -43,7 +43,7 @@ public class CheckTrade implements ITradeLogic{
 						TradeManager.getInstance().deleteOrder(id);
 					}
 					String tradeCompletedItem = String.format("%s,%s,%s,%s,%s",
-							target.getString(PARAM_KEY.created_at.name()), id, target.getLong(PARAM_KEY.id.name()), entity.getRate(), target.getString(PARAM_KEY.amount.name()));
+							target.getString(PARAM_KEY.created_at.name()), id, target.getLong(PARAM_KEY.id.name()), entity.getRate(), settlement);
 					TradeManager.getInstance().completeTrade(tradeCompletedItem);
 					orderSet.add(target.getLong(PARAM_KEY.id.name()));
 				}
