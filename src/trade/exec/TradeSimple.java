@@ -14,12 +14,13 @@ import java.math.BigDecimal;
  */
 public class TradeSimple implements  ITradeLogic{
 
-	private final double INITIAL_FUND = 8000;
+	private final double INITIAL_FUND = 10000;
 	private double currentFund = 0;
 
 	private boolean isLastTradeBuy = true;
 	private final double SELL = 0.2f;
 	private final double BUY = 0.2f;
+	private final double FIRST_BUY = 0.05f;
 
 	private double initialTradePrice = 0;
 	private double lastTradePrice = 0;
@@ -32,7 +33,7 @@ public class TradeSimple implements  ITradeLogic{
 
 		double current = CoinManager.getInstance().getCurrentRate();
 		if (lastTradePrice == 0){
-			int orderRate = (int)(current * ((100 - BUY) / 100));
+			int orderRate = (int)(current * ((100 - FIRST_BUY) / 100));
 			double amount = INITIAL_FUND / orderRate;
 			String result = CoinCheckClient.postBuyRequest(String.valueOf(orderRate), String.valueOf(amount));
 			postTrade(result);
@@ -69,7 +70,7 @@ public class TradeSimple implements  ITradeLogic{
 		}
 		currentFund = lastTradeAmount * lastTradePrice;
 //		double buyAmount = (currentFund) / buyRate;
-		BigDecimal buyAmount = new BigDecimal((currentFund) / buyRate).setScale(5);
+		BigDecimal buyAmount = new BigDecimal((currentFund) / buyRate).setScale(5, BigDecimal.ROUND_HALF_UP);
 		String result = CoinCheckClient.postBuyRequest(String.valueOf(buyRate), buyAmount.toString());
 		postTrade(result);
 	}
