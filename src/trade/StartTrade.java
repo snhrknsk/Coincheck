@@ -24,7 +24,7 @@ public class StartTrade {
         System.out.println("start trade");
         initialize(args[0], args[1]);
 
-        new TaskWorker().startTask(60000, 1800000);
+        new TaskWorker().startTask(60000, 25200000);
 
 //        test();
     }
