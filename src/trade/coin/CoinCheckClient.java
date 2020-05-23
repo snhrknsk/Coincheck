@@ -86,7 +86,7 @@ public class CoinCheckClient {
                 responseData = EntityUtils.toString(response.getEntity(), charset);
             } else {
                 String error = EntityUtils.toString(response.getEntity(), charset);
-                System.out.println(error);
+                System.err.println(error);
             }
         } catch (IOException e) {
             e.printStackTrace();
