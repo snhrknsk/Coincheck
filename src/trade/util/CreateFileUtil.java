@@ -27,21 +27,19 @@ public class CreateFileUtil {
 				p.print(header);
 				p.println();
 				// set contents
-				List<String> priceHistory = CoinManager.getInstance().getPriceHistory();
+				List<CoinManager.PriceEntity> priceHistory = CoinManager.getInstance().getPriceHistory();
 				double preVal = 0;
-				for (String element : priceHistory) {
-					p.print(element);
-					String[] temp = element.split(",");
-					if (temp.length > 1) {
-						if (Double.valueOf(temp[1]) > preVal) {
-							p.print(",↑");
-						} else if (Double.valueOf(temp[1]) < preVal) {
-							p.print(",↓");
-						} else {
-							p.print(",=");
-						}
-						preVal = Double.valueOf(temp[1]);
+				for (CoinManager.PriceEntity element : priceHistory) {
+					p.print(element.date + ",");
+					p.print(element.rate);
+					if (Double.valueOf(element.rate) > preVal) {
+						p.print(",↑");
+					} else if (Double.valueOf(element.rate) < preVal) {
+						p.print(",↓");
+					} else {
+						p.print(",=");
 					}
+					preVal = Double.valueOf(element.rate);
 					p.println();
 				}
 			}
@@ -57,13 +55,16 @@ public class CreateFileUtil {
 		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() +fileName, false)){
 			try(PrintWriter p = new PrintWriter(new BufferedWriter(f))) {
 				// set header
-				String header = "Date,Order Id,Trade Id,Rate,Amount";
+				String header = "Date,Order Id,Trade Id,Buy or Sell,Rate,Amount";
 				p.print(header);
 				p.println();
 				// set contents
-				List<String> priceHistory = TradeManager.getInstance().getCompletedTradeList();
-				for (String element : priceHistory) {
-					p.print(element);
+				List<TradeManager.TradedOrderEntity> priceHistory = TradeManager.getInstance().getCompletedTradeList();
+				for (TradeManager.TradedOrderEntity element : priceHistory) {
+					String buy = element.isBuyOrder() ? "買" : "売";
+					String result = String.format("%s,%s,%s,%s,%s.%s",
+							element.getDate(), element.getOrderId(), element.getTradeId(), buy, element.getRate(), element.getAmount());
+					p.print(result);
 					p.println();
 				}
 			}

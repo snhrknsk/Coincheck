@@ -12,7 +12,7 @@ public class TradeManager {
 
 	private static TradeManager tradeManager = null;
 	Map<String, TradeEntity> orderIDMap = new HashMap<>();
-	List<String> tradeCompletedList = new ArrayList<>();
+	List<TradedOrderEntity> tradeCompletedList = new ArrayList<>();
 
 	private TradeManager(){}
 
@@ -25,13 +25,17 @@ public class TradeManager {
 
 	public void addOrder(JSONObject orderJSON){
 		String id = String.valueOf(orderJSON.getLong(PARAM_KEY.id.name()));
-		TradeEntity entity = new TradeEntity(String.valueOf(orderJSON.getString(PARAM_KEY.rate.name())), orderJSON.getString(PARAM_KEY.amount.name()));
+		boolean isOrderBuy = orderJSON.getString(PARAM_KEY.order_type.name()).equals("buy");
+		TradeEntity entity = new TradeEntity(String.valueOf(orderJSON.getString(PARAM_KEY.rate.name())), orderJSON.getString(PARAM_KEY.amount.name()),
+				isOrderBuy, orderJSON.getString(PARAM_KEY.data.name()));
 		orderIDMap.put(id, entity);
 	}
 
 	public void deleteOrder(String id){
 		if (orderIDMap.remove(id) == null){
-			System.out.println("Already order canceled. ID : " + id);
+			System.out.println("Order is already canceled. ID : " + id);
+		} else {
+			System.out.println("The order is deleted completely. ID " + id);
 		}
 	}
 
@@ -52,37 +56,70 @@ public class TradeManager {
 
 	/**
 	 * This message must be the following format(csv)<br>
-	 * Date, Order Id, Trade Id, Rate, Amount
-	 * @param message
+	 * Date, Order Id, isBuy, Trade Id, Rate, Amount
+	 * @param element
 	 */
-	public void completeTrade(String message){
-		tradeCompletedList.add(message);
+	public void completeTrade(TradedOrderEntity element){
+		tradeCompletedList.add(element);
 	}
-	public List<String> getCompletedTradeList(){
+	public List<TradedOrderEntity> getCompletedTradeList(){
 		return tradeCompletedList;
 	}
 
 
-	public class TradeEntity{
+	public static class TradeEntity {
+		private boolean isBuyOrder = true;
 		private double rate;
 		private double amount;
+		private String date;
 
-		public TradeEntity(double rate, double amount){
-			this.rate = rate;
-			this.amount = amount;
-		}
-
-		public TradeEntity(String rate, String amount){
+		public TradeEntity(String rate, String amount, boolean isBuyOrder, String date) {
 			this.rate = Double.valueOf(rate);
 			this.amount = Double.valueOf(amount);
+			this.isBuyOrder = isBuyOrder;
+			this.date = date;
 		}
 
-		public void setAmount(double amount) {
-			this.amount = amount;
+		public double getAmount() {
+			return amount;
 		}
+		public double getRate() {
+			return rate;
+		}
+		public boolean isBuyOrder() { return isBuyOrder; };
+		public String getDate(){ return date; }
 
-		public void setRate(double rate) {
-			this.rate = rate;
+		/**
+		 * Reduce Settlement amount. This order is all executed return true.
+		 *
+		 * @param reduction
+		 * @return
+		 */
+		public boolean execSettlement(double reduction) {
+			amount = reduction;
+			if (amount <= 0) {
+				return true;
+			}
+			return false;
+		}
+	}
+
+	public static class TradedOrderEntity{
+		private boolean isBuyOrder = true;
+		private double rate;
+		private double amount;
+		private String orderId = "";
+		private String tradeId = "";
+		private String date = "";
+
+
+		TradedOrderEntity(Builder builder){
+			isBuyOrder = builder.isBuyOrder;
+			rate = builder.rate;
+			amount = builder.amount;
+			orderId = builder.orderId;
+			tradeId = builder.tradeId;
+			date = builder.date;
 		}
 
 		public double getAmount() {
@@ -93,17 +130,46 @@ public class TradeManager {
 			return rate;
 		}
 
-		/**
-		 * Reduce Settlement amount. This order is all executed return true.
-		 * @param reduction
-		 * @return
-		 */
-		public boolean execSettlement(double reduction){
-			amount -= reduction;
-			if (amount <= 0){
-				return true;
+		public boolean isBuyOrder(){ return isBuyOrder; }
+
+		public String getOrderId(){ return orderId; }
+
+		public String getTradeId(){ return tradeId; }
+
+		public String getDate(){ return date; }
+
+		public static class Builder{
+			double rate;
+			double amount;
+			boolean isBuyOrder;
+			String orderId = "";
+			String tradeId = "";
+			String date = "";
+
+			public Builder(double rate, double amount, boolean isBuyOrder){
+				this.rate = rate;
+				this.amount = amount;
+				this.isBuyOrder = isBuyOrder;
 			}
-			return false;
+
+			public Builder orderId(String orderId){
+				this.orderId = orderId;
+				return this;
+			}
+
+			public Builder tradeId(String tradeId){
+				this.tradeId = tradeId;
+				return this;
+			}
+
+			public Builder date(String date){
+				this.date = date;
+				return this;
+			}
+
+			public TradedOrderEntity build(){
+				return new TradedOrderEntity(this);
+			}
 		}
 	}
 

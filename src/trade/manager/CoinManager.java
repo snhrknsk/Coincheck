@@ -2,6 +2,7 @@ package trade.manager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public class CoinManager {
 	private static CoinManager coinManager = null;
 
 	private double currentRate = 0;
-	private List<String> rateList = new ArrayList<>();
+	private List<PriceEntity> rateList = new LinkedList<>();
 
 	private CoinManager(){
 	}
@@ -27,14 +28,23 @@ public class CoinManager {
 
 	public void setCurrentRate(String currentRate) {
 		this.currentRate = Double.valueOf(currentRate);
-		rateList.add(new Date(System.currentTimeMillis()) + "," + String.valueOf(currentRate));
+		PriceEntity entity = new PriceEntity();
+		entity.date = new Date(System.currentTimeMillis()).toString();
+		entity.rate = String.valueOf(currentRate);
+		rateList.add(entity);
 	}
 
 	public double getCurrentRate() {
 		return currentRate;
 	}
 
-	public List<String> getPriceHistory(){
+	public List<PriceEntity> getPriceHistory(){
 		return rateList;
 	}
+
+	public static class PriceEntity{
+		public String date = "";
+		public String rate = "";
+	}
+
 }

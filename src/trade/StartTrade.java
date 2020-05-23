@@ -1,13 +1,9 @@
 package trade;
 
-import org.json.JSONObject;
-import trade.coin.CoinCheckClient;
-import trade.coin.PARAM_KEY;
+import ui.HomeUI;
 import trade.exec.CheckRate;
 import trade.exec.CheckTrade;
-import trade.exec.TaskWorker;
 import trade.manager.AccountInfo;
-import trade.manager.TradeManager;
 
 /**
  * Coincheck official API<br>
@@ -24,7 +20,17 @@ public class StartTrade {
         System.out.println("start trade");
         initialize(args[0], args[1]);
 
-        new TaskWorker().startTask(60000, 25200000);
+        new HomeUI();
+
+//
+//        TaskWorker taskWorker = new TaskWorker();
+//        taskWorker.startTask(60000);
+//        try {
+//            Thread.sleep(30000);
+//        } catch (InterruptedException e) {
+//        }
+//        taskWorker.stopAllTask();
+
 
 //        test();
     }

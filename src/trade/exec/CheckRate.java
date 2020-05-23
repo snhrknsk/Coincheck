@@ -4,6 +4,8 @@ import org.json.JSONObject;
 import trade.coin.CoinCheckClient;
 import trade.manager.CoinManager;
 
+import java.util.List;
+
 /**
  * Check current price.<br>
  * Save latest price in {@link CoinManager}.

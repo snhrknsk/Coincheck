@@ -41,10 +41,12 @@ public class CheckTrade implements ITradeLogic{
 					if (entity.execSettlement(settlement)){
 						System.out.println("All order is settled. ID : " + id);
 						TradeManager.getInstance().deleteOrder(id);
+					} else {
+						System.out.println("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
 					}
-					String tradeCompletedItem = String.format("%s,%s,%s,%s,%s",
-							target.getString(PARAM_KEY.created_at.name()), id, target.getLong(PARAM_KEY.id.name()), entity.getRate(), settlement);
-					TradeManager.getInstance().completeTrade(tradeCompletedItem);
+					TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(entity.getRate(), entity.getAmount(), entity.isBuyOrder())
+							.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).build();
+					TradeManager.getInstance().completeTrade(tradedEntity);
 					orderSet.add(target.getLong(PARAM_KEY.id.name()));
 				}
 			}

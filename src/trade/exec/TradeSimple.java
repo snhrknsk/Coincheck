@@ -7,6 +7,7 @@ import trade.manager.CoinManager;
 import trade.manager.TradeManager;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 /**
  * Loop the following entry and sell<br>
@@ -14,13 +15,13 @@ import java.math.BigDecimal;
  */
 public class TradeSimple implements  ITradeLogic{
 
-	private final double INITIAL_FUND = 10000;
+	private double INITIAL_FUND = 8000;
 	private double currentFund = 0;
 
 	private boolean isLastTradeBuy = true;
-	private final double SELL = 0.2f;
-	private final double BUY = 0.2f;
-	private final double FIRST_BUY = 0.05f;
+	private double SELL = 0.3f;
+	private double BUY = 0.3f;
+	private double FIRST_BUY = 0.05f;
 
 	private double initialTradePrice = 0;
 	private double lastTradePrice = 0;
@@ -49,6 +50,76 @@ public class TradeSimple implements  ITradeLogic{
 		}
 	}
 
+	/**
+	 * Set params as the following order.
+	 * Funds, FirstBuyDecline, SellSoarRate, BuyDeclineRate
+	 * @param params
+	 * @return
+	 */
+	@Override
+	public synchronized boolean setParams(List<String> params) {
+
+		int paramSize = 4;
+		if (params.size() != paramSize){
+			System.out.println("The argument size is invalid. Need " + paramSize);
+			return false;
+		}
+		try {
+			INITIAL_FUND = Double.valueOf(params.get(0));
+			FIRST_BUY = Double.valueOf(params.get(1));
+			SELL = Double.valueOf(params.get(2));
+			BUY = Double.valueOf(params.get(3));
+			isLastTradeBuy = true;
+			initialTradePrice = 0;
+			lastTradePrice = 0;
+			lastTradeAmount = 0;
+			if (!prevOrderId.equals("0")) {
+				resetTrade(prevOrderId);
+			}
+		} catch (NumberFormatException e){
+			e.printStackTrace();
+			return false;
+		}
+		return true;
+	}
+
+	@Override
+	public boolean stopTask() {
+		if (!prevOrderId.equals("0") && TradeManager.getInstance().getOrder(prevOrderId) != null) {
+			resetTrade(prevOrderId);
+		} else {
+			System.out.println("There is no active order. Previous order ID is " + prevOrderId );
+		}
+		return true;
+	}
+
+	@Override
+	public boolean resetTrade(String orderId){
+		if (!isLastTradeBuy){
+			String result =CoinCheckClient.postOrderCancel(orderId);
+			JSONObject resultObject = new JSONObject(result);
+			if (!resultObject.getBoolean(PARAM_KEY.success.name())){
+				System.out.println(result);
+				return false;
+			}
+			TradeManager.getInstance().deleteOrder(orderId);
+			System.out.println("The order is canceled. ID = " + resultObject.getString(PARAM_KEY.id.name()));
+			return true;
+		}
+		System.out.println("Last order is BUY. So, sell order is not cancel;");
+		return true;
+	}
+
+	@Override
+	public String getParams(){
+		StringBuilder param = new StringBuilder();
+		param.append("INITIAL Funds:" + INITIAL_FUND);
+		param.append("¥nFIRST BUY RATE:" + FIRST_BUY );
+		param.append("¥nSELL SOAR RATE:" + SELL);
+		param.append("¥nBUY DECLINE RATE:" + BUY);
+		return param.toString();
+	}
+
 	private void sell(double current){
 
 		int sellRate = (int)current;
@@ -69,7 +140,6 @@ public class TradeSimple implements  ITradeLogic{
 			buyRate = (int)(current * ((100 - BUY) / 100));
 		}
 		currentFund = lastTradeAmount * lastTradePrice;
-//		double buyAmount = (currentFund) / buyRate;
 		BigDecimal buyAmount = new BigDecimal((currentFund) / buyRate).setScale(5, BigDecimal.ROUND_HALF_UP);
 		String result = CoinCheckClient.postBuyRequest(String.valueOf(buyRate), buyAmount.toString());
 		postTrade(result);
@@ -79,7 +149,7 @@ public class TradeSimple implements  ITradeLogic{
 		return TradeManager.getInstance().isCompletedOrder(prevOrderId);
 	}
 
-	private void postTrade(String result){
+	private synchronized void postTrade(String result){
 		if (result.isEmpty()){
 			System.out.println("TradeSimple.class Fail to post trade request.");
 			return;
@@ -107,7 +177,7 @@ public class TradeSimple implements  ITradeLogic{
 		prevOrderId = id;
 		lastTradePrice = Double.valueOf(rate);
 		lastTradeAmount = Double.valueOf(amount);
-		System.out.println(" Exec Post Order ID : " + id + " RATE : " + rate + " Amount" + amount + " DATE : " + date);
+		System.out.println(" Exec Post Order ID : " + id + " Order Type : " + orderType + " RATE : " + rate + " Amount" + amount + " DATE : " + date);
 	}
 
 }
