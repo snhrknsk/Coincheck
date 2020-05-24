@@ -2,6 +2,7 @@ package ui;
 
 import javax.swing.*;
 
+/** If you create implemented class, add {@link HomeUI}'s tab panel */
 public interface ITabComponent {
 
 	public String getTabName();

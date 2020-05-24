@@ -102,6 +102,7 @@ public class HistoryDispUI implements ITabComponent{
 	}
 
 	private void updateTradeHistory(){
+		tradeHistoryTableModel.setNumRows(0);
 		List<TradeManager.TradedOrderEntity> tradedEntity = TradeManager.getInstance().getCompletedTradeList();
 		for (ListIterator<TradeManager.TradedOrderEntity> it = tradedEntity.listIterator(tradedEntity.size()); it.hasPrevious() ;){
 			TradeManager.TradedOrderEntity entity = it.previous();

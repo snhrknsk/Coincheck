@@ -7,7 +7,10 @@ import trade.manager.CoinManager;
 import trade.manager.TradeManager;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
 
 /**
  * Loop the following entry and sell<br>
@@ -15,8 +18,11 @@ import java.util.List;
  */
 public class TradeSimple implements  ITradeLogic{
 
+	private static long TASK_ID = 0;
+
+	private long taskID = 0;
 	private double INITIAL_FUND = 8000;
-	private double currentFund = 0;
+	private double currentFund = INITIAL_FUND;
 
 	private boolean isLastTradeBuy = true;
 	private double SELL = 0.3f;
@@ -26,8 +32,11 @@ public class TradeSimple implements  ITradeLogic{
 	private double initialTradePrice = 0;
 	private double lastTradePrice = 0;
 	private double lastTradeAmount = 0;
-
 	private String prevOrderId = "0";
+
+	public TradeSimple(){
+		taskID = TASK_ID++;
+	}
 
 	@Override
 	public void exec() {
@@ -51,24 +60,24 @@ public class TradeSimple implements  ITradeLogic{
 	}
 
 	/**
-	 * Set params as the following order.
-	 * Funds, FirstBuyDecline, SellSoarRate, BuyDeclineRate
+	 * Set params as the following map key.
+	 * INITIAL_FUND, FIRST_BUY, SELL, BUY
 	 * @param params
 	 * @return
 	 */
 	@Override
-	public synchronized boolean setParams(List<String> params) {
+	public synchronized boolean setParams(Map<String, String> params) {
 
-		int paramSize = 4;
-		if (params.size() != paramSize){
-			System.out.println("The argument size is invalid. Need " + paramSize);
+		System.out.println("Set params to TradeSimple logic : " + params);
+		if (params.size() != 4){
+			System.out.println("The argument size is invalid. Need " + 4);
 			return false;
 		}
 		try {
-			INITIAL_FUND = Double.valueOf(params.get(0));
-			FIRST_BUY = Double.valueOf(params.get(1));
-			SELL = Double.valueOf(params.get(2));
-			BUY = Double.valueOf(params.get(3));
+			INITIAL_FUND = Double.valueOf(params.get("INITIAL_FUND"));
+			FIRST_BUY = Double.valueOf(params.get("FIRST_BUY"));
+			SELL = Double.valueOf(params.get("SELL"));
+			BUY = Double.valueOf(params.get("BUY"));
 			isLastTradeBuy = true;
 			initialTradePrice = 0;
 			lastTradePrice = 0;
@@ -81,6 +90,17 @@ public class TradeSimple implements  ITradeLogic{
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public Map<String, String> getParams(){
+		Map<String, String> param = new LinkedHashMap<>();
+		param.put("INITIAL_FUND", String.valueOf(INITIAL_FUND));
+		param.put("FIRST_BUY", String.valueOf(FIRST_BUY));
+		param.put("SELL", String.valueOf(SELL));
+		param.put("BUY", String.valueOf(BUY));
+		param.put("CURRENT_FUNDS", String.valueOf(currentFund));
+		return param;
 	}
 
 	@Override
@@ -106,18 +126,8 @@ public class TradeSimple implements  ITradeLogic{
 			System.out.println("The order is canceled. ID = " + resultObject.getString(PARAM_KEY.id.name()));
 			return true;
 		}
-		System.out.println("Last order is BUY. So, sell order is not cancel;");
+		System.out.println("Last order is BUY. So, current sell order is not cancel;");
 		return true;
-	}
-
-	@Override
-	public String getParams(){
-		StringBuilder param = new StringBuilder();
-		param.append("INITIAL Funds:" + INITIAL_FUND);
-		param.append("¥nFIRST BUY RATE:" + FIRST_BUY );
-		param.append("¥nSELL SOAR RATE:" + SELL);
-		param.append("¥nBUY DECLINE RATE:" + BUY);
-		return param.toString();
 	}
 
 	private void sell(double current){
@@ -178,6 +188,11 @@ public class TradeSimple implements  ITradeLogic{
 		lastTradePrice = Double.valueOf(rate);
 		lastTradeAmount = Double.valueOf(amount);
 		System.out.println(" Exec Post Order ID : " + id + " Order Type : " + orderType + " RATE : " + rate + " Amount" + amount + " DATE : " + date);
+	}
+
+	@Override
+	public String toString(){
+		return getLogicName() + "#" + taskID;
 	}
 
 }

@@ -5,9 +5,19 @@ import trade.coin.CoinCheckClient;
 import trade.coin.PARAM_KEY;
 import trade.manager.TradeManager;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public interface ITradeLogic {
+
+	/**
+	 * Logic name
+	 */
+	default public String getLogicName(){
+		return this.getClass().getName();
+	}
 	/**
 	 * Your trade logic<br>
 	 * Call this method from Task Worker at constants interval
@@ -18,15 +28,15 @@ public interface ITradeLogic {
 	 * Argument "Params" is the defined parameters list(Defined Order in each logic).
 	 * If restart this logic, call this method.
 	 */
-	default public boolean setParams(List<String> params){
+	default public boolean setParams(Map<String, String> params){
 		return true;
 	};
 
 	/**
 	 * Get current settings.
 	 */
-	default public String getParams(){
-		return "";
+	default public Map<String, String> getParams(){
+		return new HashMap<>();
 	}
 
 	/**

@@ -15,26 +15,6 @@ public class TaskWorker {
 //	private List<ITradeLogic> taskList = new ArrayList<>();
 	private Timer timer = null;
 
-	public enum LOGIC_SET{
-		TradeSimple{
-			@Override
-			public ITradeLogic createInstance() {
-				return new TradeSimple();
-			}
-		},
-		TradeTrend{
-			@Override
-			public ITradeLogic createInstance() {
-				return new TradeTrend();
-			}
-		},
-		;
-		private ITradeLogic instance;
-		private LOGIC_SET(){
-		}
-		public abstract ITradeLogic createInstance();
-	}
-
 	/**
 	 * Edit this constructor for exec trade logic<br>
 	 * Add initial exec logic class to {@link TaskManager#getTradingTask()} to exec them.<br>
@@ -71,8 +51,6 @@ public class TaskWorker {
 		System.out.println(LocalDateTime.now() + " End Trade.");
 		postProcess();
 	}
-
-
 
 	public void postProcess(){
 

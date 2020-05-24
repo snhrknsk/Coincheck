@@ -1,9 +1,6 @@
 package trade.manager;
 
-import trade.exec.CheckRate;
-import trade.exec.CheckTrade;
-import trade.exec.ITradeLogic;
-import trade.exec.TradeSimple;
+import trade.exec.*;
 
 import java.util.*;
 
@@ -12,10 +9,32 @@ import java.util.*;
  */
 public class TaskManager {
 
+	private static volatile long TASK_ID = 0;
+
+	public enum LOGIC_SET{
+		TradeSimple{
+			@Override
+			public ITradeLogic createInstance() {
+				return new TradeSimple();
+			}
+		},
+		TradeTrend{
+			@Override
+			public ITradeLogic createInstance() {
+				return new TradeTrend();
+			}
+		},
+		;
+		private ITradeLogic instance;
+		private LOGIC_SET(){}
+		public abstract ITradeLogic createInstance();
+	}
+
 	private static TaskManager instance = null ;
 	private Map<String, ITradeLogic> tradingTaskMap = Collections.synchronizedMap(new TreeMap<>());
 
 	private TaskManager() {
+		//initial run logic
 		tradingTaskMap.put("CheckRate", new CheckRate());
 		tradingTaskMap.put("CheckTrade", new CheckTrade());
 		tradingTaskMap.put("TradeSimple", new TradeSimple());
@@ -34,6 +53,13 @@ public class TaskManager {
 			taskList.add(logic);
 		}
 		return taskList;
+	}
+
+	/**
+	 * return task name and its task instance
+	 */
+	public synchronized Map<String, ITradeLogic> getTradingTaskMap(){
+		return tradingTaskMap;
 	}
 
 	/**
@@ -57,9 +83,9 @@ public class TaskManager {
 	 * Start specified task.
 	 * @return new task name(class name + No[incremented])
 	 */
-	public synchronized String startNewTask(String startTaskName) {
-		// TODO: implement this method.
-		throw new UnsupportedOperationException();
+	public synchronized String startNewTask(ITradeLogic startTask) {
+		tradingTaskMap.put(startTask + "#" + TASK_ID++, startTask);
+		return startTask.getLogicName();
 	}
 
 

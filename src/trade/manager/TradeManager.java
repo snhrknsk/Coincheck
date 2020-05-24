@@ -27,7 +27,7 @@ public class TradeManager {
 		String id = String.valueOf(orderJSON.getLong(PARAM_KEY.id.name()));
 		boolean isOrderBuy = orderJSON.getString(PARAM_KEY.order_type.name()).equals("buy");
 		TradeEntity entity = new TradeEntity(String.valueOf(orderJSON.getString(PARAM_KEY.rate.name())), orderJSON.getString(PARAM_KEY.amount.name()),
-				isOrderBuy, orderJSON.getString(PARAM_KEY.data.name()));
+				isOrderBuy, orderJSON.getString(PARAM_KEY.created_at.name()));
 		orderIDMap.put(id, entity);
 	}
 
@@ -96,21 +96,23 @@ public class TradeManager {
 		 * @return
 		 */
 		public boolean execSettlement(double reduction) {
-			amount = reduction;
+			amount -= reduction;
 			if (amount <= 0) {
 				return true;
 			}
+			System.out.println(amount + " is remain.");
 			return false;
 		}
 	}
 
 	public static class TradedOrderEntity{
-		private boolean isBuyOrder = true;
+		private boolean isBuyOrder ;
 		private double rate;
 		private double amount;
 		private String orderId = "";
 		private String tradeId = "";
 		private String date = "";
+		private String logic = "";
 
 
 		TradedOrderEntity(Builder builder){
@@ -121,22 +123,17 @@ public class TradeManager {
 			tradeId = builder.tradeId;
 			date = builder.date;
 		}
-
 		public double getAmount() {
 			return amount;
 		}
-
 		public double getRate() {
 			return rate;
 		}
-
 		public boolean isBuyOrder(){ return isBuyOrder; }
-
 		public String getOrderId(){ return orderId; }
-
 		public String getTradeId(){ return tradeId; }
-
 		public String getDate(){ return date; }
+		public String getLogic(){ return logic; }
 
 		public static class Builder{
 			double rate;
@@ -145,6 +142,7 @@ public class TradeManager {
 			String orderId = "";
 			String tradeId = "";
 			String date = "";
+			String logic = "";
 
 			public Builder(double rate, double amount, boolean isBuyOrder){
 				this.rate = rate;
@@ -164,6 +162,11 @@ public class TradeManager {
 
 			public Builder date(String date){
 				this.date = date;
+				return this;
+			}
+
+			public Builder logic(String logic){
+				this.logic = logic;
 				return this;
 			}
 
