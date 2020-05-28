@@ -23,11 +23,15 @@ public class TradeManager {
 		return tradeManager;
 	}
 
-	public void addOrder(JSONObject orderJSON){
+	/**
+	 * add the registered order to managed order map
+	 * @param orderJSON this json must be response by {@link trade.coin.TRADE_API#buy} or {@link trade.coin.TRADE_API#sell} request
+	 */
+	public void addOrder(JSONObject orderJSON, String algorithm){
 		String id = String.valueOf(orderJSON.getLong(PARAM_KEY.id.name()));
 		boolean isOrderBuy = orderJSON.getString(PARAM_KEY.order_type.name()).equals("buy");
 		TradeEntity entity = new TradeEntity(String.valueOf(orderJSON.getString(PARAM_KEY.rate.name())), orderJSON.getString(PARAM_KEY.amount.name()),
-				isOrderBuy, orderJSON.getString(PARAM_KEY.created_at.name()));
+				isOrderBuy, orderJSON.getString(PARAM_KEY.created_at.name()), algorithm);
 		orderIDMap.put(id, entity);
 	}
 
@@ -72,12 +76,14 @@ public class TradeManager {
 		private double rate;
 		private double amount;
 		private String date;
+		private String logic;
 
-		public TradeEntity(String rate, String amount, boolean isBuyOrder, String date) {
+		public TradeEntity(String rate, String amount, boolean isBuyOrder, String date, String algorithm) {
 			this.rate = Double.valueOf(rate);
 			this.amount = Double.valueOf(amount);
 			this.isBuyOrder = isBuyOrder;
 			this.date = date;
+			this.logic = algorithm;
 		}
 
 		public double getAmount() {
@@ -88,6 +94,7 @@ public class TradeManager {
 		}
 		public boolean isBuyOrder() { return isBuyOrder; };
 		public String getDate(){ return date; }
+		public String getLogic() { return logic; }
 
 		/**
 		 * Reduce Settlement amount. This order is all executed return true.
@@ -113,7 +120,6 @@ public class TradeManager {
 		private String tradeId = "";
 		private String date = "";
 		private String logic = "";
-
 
 		TradedOrderEntity(Builder builder){
 			isBuyOrder = builder.isBuyOrder;
@@ -143,33 +149,27 @@ public class TradeManager {
 			String tradeId = "";
 			String date = "";
 			String logic = "";
-
 			public Builder(double rate, double amount, boolean isBuyOrder){
 				this.rate = rate;
 				this.amount = amount;
 				this.isBuyOrder = isBuyOrder;
 			}
-
 			public Builder orderId(String orderId){
 				this.orderId = orderId;
 				return this;
 			}
-
 			public Builder tradeId(String tradeId){
 				this.tradeId = tradeId;
 				return this;
 			}
-
 			public Builder date(String date){
 				this.date = date;
 				return this;
 			}
-
 			public Builder logic(String logic){
 				this.logic = logic;
 				return this;
 			}
-
 			public TradedOrderEntity build(){
 				return new TradedOrderEntity(this);
 			}

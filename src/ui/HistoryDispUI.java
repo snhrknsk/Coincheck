@@ -38,7 +38,7 @@ public class HistoryDispUI implements ITabComponent{
 		JLabel tradeHistory = new JLabel("取引履歴");
 		tradeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
 		tradeHistoryPanel.add(tradeHistory);
-		String[] columnTradeHistoryNames = {"ID","取引ID", "日時", "売買", "レート", "量"};
+		String[] columnTradeHistoryNames = {"ID","取引ID", "日時", "売買", "レート", "量", "アルゴリズム"};
 		tradeHistoryTableModel = new DefaultTableModel(columnTradeHistoryNames, 0) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return false;
@@ -78,7 +78,7 @@ public class HistoryDispUI implements ITabComponent{
 		JLabel order = new JLabel("現在注文");
 		order.setAlignmentX(Component.CENTER_ALIGNMENT);
 		orderPanel.add(order);
-		String[] columnCurrentOrderNames = {"ID", "日時", "売買", "レート", "量"};
+		String[] columnCurrentOrderNames = {"ID", "日時", "売買", "レート", "量", "アルゴリズム"};
 		currentOrderTableModel = new DefaultTableModel(columnCurrentOrderNames, 0) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return false;
@@ -95,22 +95,33 @@ public class HistoryDispUI implements ITabComponent{
 	}
 
 	@Override
+	public void updateByConstantInterval() {
+		updateComponent();
+	}
+
+	@Override
 	public void updateComponent() {
 		updateTradeHistory();
 		updatePriceHistory();
 		updateCurrentOrder();
 	}
 
+	/**
+	 * Update Trade History
+	 */
 	private void updateTradeHistory(){
 		tradeHistoryTableModel.setNumRows(0);
 		List<TradeManager.TradedOrderEntity> tradedEntity = TradeManager.getInstance().getCompletedTradeList();
 		for (ListIterator<TradeManager.TradedOrderEntity> it = tradedEntity.listIterator(tradedEntity.size()); it.hasPrevious() ;){
 			TradeManager.TradedOrderEntity entity = it.previous();
 			String buySell = entity.isBuyOrder() ? "買い" : "売り" ;
-			tradeHistoryTableModel.addRow(new String[]{entity.getOrderId(), entity.getTradeId(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount())});
+			tradeHistoryTableModel.addRow(new String[]{entity.getOrderId(), entity.getTradeId(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), entity.getLogic()});
 		}
 	}
 
+	/**
+	 * Update Price History
+	 */
 	private void updatePriceHistory(){
 		priceHistoryTableModel.setNumRows(0);
 		List<CoinManager.PriceEntity> history = CoinManager.getInstance().getPriceHistory();
@@ -121,13 +132,16 @@ public class HistoryDispUI implements ITabComponent{
 		}
 	}
 
+	/**
+	 * Update Current Orders
+	 */
 	private void updateCurrentOrder(){
 		currentOrderTableModel.setNumRows(0);
 		Map<String, TradeManager.TradeEntity> orderMap = TradeManager.getInstance().getAllOrder();
 		for (Map.Entry<String, TradeManager.TradeEntity> element: orderMap.entrySet()) {
 			TradeManager.TradeEntity entity = element.getValue();
 			String buySell = entity.isBuyOrder() ? "買い" : "売り" ;
-			currentOrderTableModel.addRow(new String[]{element.getKey(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount())});
+			currentOrderTableModel.addRow(new String[]{element.getKey(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), entity.getLogic()});
 		}
 	}
 

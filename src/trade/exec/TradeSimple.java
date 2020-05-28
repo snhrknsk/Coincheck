@@ -69,10 +69,6 @@ public class TradeSimple implements  ITradeLogic{
 	public synchronized boolean setParams(Map<String, String> params) {
 
 		System.out.println("Set params to TradeSimple logic : " + params);
-		if (params.size() != 4){
-			System.out.println("The argument size is invalid. Need " + 4);
-			return false;
-		}
 		try {
 			INITIAL_FUND = Double.valueOf(params.get("INITIAL_FUND"));
 			FIRST_BUY = Double.valueOf(params.get("FIRST_BUY"));
@@ -123,7 +119,7 @@ public class TradeSimple implements  ITradeLogic{
 				return false;
 			}
 			TradeManager.getInstance().deleteOrder(orderId);
-			System.out.println("The order is canceled. ID = " + resultObject.getString(PARAM_KEY.id.name()));
+			System.out.println("The order is canceled. ID = " + resultObject.getLong(PARAM_KEY.id.name()));
 			return true;
 		}
 		System.out.println("Last order is BUY. So, current sell order is not cancel;");
@@ -182,8 +178,7 @@ public class TradeSimple implements  ITradeLogic{
 			System.out.println("Order is not correct. Order type is not buy or sell");
 			return;
 		}
-
-		TradeManager.getInstance().addOrder(resultJSON);
+		TradeManager.getInstance().addOrder(resultJSON, toString());
 		prevOrderId = id;
 		lastTradePrice = Double.valueOf(rate);
 		lastTradeAmount = Double.valueOf(amount);

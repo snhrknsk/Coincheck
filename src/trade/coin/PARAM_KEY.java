@@ -2,21 +2,32 @@ package trade.coin;
 
 public enum PARAM_KEY {
 	//REQ,RESP COMMON
-	id,//long
+	/**getLong */
+	id,
+	/**getString */
 	rate,
+	/**getString */
 	amount,
+	/**getString */
 	order_type,
 	pair,
 	//REQUEST
-
 	//RESPONSE
-	success,//boolean
+	/**getBoolean */
+	success,
+	/**getString */
 	created_at,
-	data,//JSON Array
-	order_id,//long
-	orders,//JSON Array
+	/**JSON Array */
+	data,
+	/**getLong */
+	order_id,
+	/**JSON Array */
+	orders,
+	/**getString */
 	pending_amount,
-	funds,//JSONObject
+	/**JSON Object */
+	funds,
+	/**getString */
 	btc,
 	;
 }

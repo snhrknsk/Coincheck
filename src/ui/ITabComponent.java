@@ -8,4 +8,5 @@ public interface ITabComponent {
 	public String getTabName();
 	public JPanel createPanel();
 	public void updateComponent();
+	default public void updateByConstantInterval(){};
 }

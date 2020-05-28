@@ -35,15 +35,15 @@ public class HomeUI extends JFrame implements ActionListener {
 
 	public HomeUI(){
 		super();
-		setSize(900,500);
-		setTitle("勝手に取引マン");
 		initialize();
-		setVisible(true);
 		taskWorker = new TaskWorker();
 	}
 
 	private void initialize(){
+		setSize(1000,600);
+		setTitle("勝手に取引マン");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setLocationRelativeTo(null);
 
 		setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
@@ -52,6 +52,7 @@ public class HomeUI extends JFrame implements ActionListener {
 
 		JSONObject current = new JSONObject(CoinCheckClient.getCurrentPrice());
 		String price = current.getString(PARAM_KEY.rate.name());
+		CoinManager.getInstance().setCurrentRate(price);
 		currentPrice = new JLabel("現在価格 : " + price);
 		panel.add(currentPrice);
 		startUpdatePrice();
@@ -75,6 +76,7 @@ public class HomeUI extends JFrame implements ActionListener {
 			tabPane.addTab(component.getTabName(), component.createPanel());
 		}
 		add("Center", tabPane);
+		setVisible(true);
 	}
 
 	@Override
@@ -107,6 +109,9 @@ public class HomeUI extends JFrame implements ActionListener {
 			@Override
 			public void run() {
 				currentPrice.setText(String.valueOf(CoinManager.getInstance().getCurrentRate()));
+				for (ITabComponent component: tabInstanceList) {
+					component.updateByConstantInterval();
+				}
 			}
 		}, INTERVAL, INTERVAL);
 	}
