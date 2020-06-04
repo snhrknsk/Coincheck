@@ -6,7 +6,8 @@ public enum TRADE_API {
     buy("/api/exchange/orders"),
     sell("/api/exchange/orders"),
     cancel("/api/exchange/orders/"),
-    open("/api/exchange/orders/opens")
+    open("/api/exchange/orders/opens"),
+    account("api/accounts"),
     ;
 
     private final String BASE_API = "https://coincheck.com";

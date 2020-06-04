@@ -159,4 +159,10 @@ public class CoinCheckClient {
         String result = postRequest(REQUEST_TYPE.GET_AUTH, uri, "");
         return result;
     }
+
+    public static String getAccountInfo(){
+        String uri = TRADE_API.account.getUrl();
+        String result = postRequest(REQUEST_TYPE.GET_AUTH, uri, "");
+        return result;
+    }
 }

@@ -6,6 +6,7 @@ public class AccountInfo {
 
 	private String accessKey = "";
 	private String secretKey = "";
+	//TODO : set from configuration file
 	private String outputFilePath = "/Users/shinohara/Documents/CoinCheckHistory";
 
 	private AccountInfo() {

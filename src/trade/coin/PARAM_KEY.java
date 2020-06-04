@@ -29,5 +29,7 @@ public enum PARAM_KEY {
 	funds,
 	/**getString */
 	btc,
+	/**getString */
+	email
 	;
 }
