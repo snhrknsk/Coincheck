@@ -1,5 +1,7 @@
 package trade.util;
 
+import org.apache.log4j.Logger;
+
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
@@ -10,6 +12,7 @@ import java.util.Map;
 
 public class Util {
 
+    private static Logger log = Logger.getLogger(Util.class);
     public Util() {
     }
 
@@ -30,9 +33,8 @@ public class Util {
             return sb.toString();
 
         } catch (NoSuchAlgorithmException | InvalidKeyException e) {
-            e.printStackTrace();
+            log.error(e);
         }
-
         return null;
     }
 

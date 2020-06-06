@@ -1,5 +1,6 @@
 package trade.manager;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import trade.coin.PARAM_KEY;
 
@@ -11,6 +12,7 @@ import java.util.*;
 public class TradeManager {
 
 	private static TradeManager tradeManager = null;
+	private static Logger log = Logger.getLogger(TradeManager.class);
 	Map<String, TradeEntity> orderIDMap = new HashMap<>();
 	List<TradedOrderEntity> tradeCompletedList = new ArrayList<>();
 
@@ -37,9 +39,9 @@ public class TradeManager {
 
 	public void deleteOrder(String id){
 		if (orderIDMap.remove(id) == null){
-			System.out.println("Order is already canceled. ID : " + id);
+			log.warn("Order is already canceled. ID : " + id);
 		} else {
-			System.out.println("The order is deleted completely. ID " + id);
+			log.info("The order is deleted completely. ID " + id);
 		}
 	}
 
@@ -74,6 +76,7 @@ public class TradeManager {
 	public static class TradeEntity {
 		private boolean isBuyOrder = true;
 		private double rate;
+		private double orderAmount;
 		private double amount;
 		private String date;
 		private String logic;
@@ -81,6 +84,7 @@ public class TradeManager {
 		public TradeEntity(String rate, String amount, boolean isBuyOrder, String date, String algorithm) {
 			this.rate = Double.valueOf(rate);
 			this.amount = Double.valueOf(amount);
+			this.orderAmount = Double.valueOf(amount);
 			this.isBuyOrder = isBuyOrder;
 			this.date = date;
 			this.logic = algorithm;
@@ -89,6 +93,7 @@ public class TradeManager {
 		public double getAmount() {
 			return amount;
 		}
+		public double getOrderAmount() { return orderAmount; }
 		public double getRate() {
 			return rate;
 		}

@@ -1,5 +1,6 @@
 package trade.exec;
 
+import org.apache.log4j.Logger;
 import trade.manager.TaskManager;
 import trade.util.CreateFileUtil;
 
@@ -12,7 +13,7 @@ import java.util.*;
  */
 public class TaskWorker {
 
-//	private List<ITradeLogic> taskList = new ArrayList<>();
+	private static Logger log = Logger.getLogger(TaskWorker.class);
 	private Timer timer = null;
 
 	/**
@@ -26,16 +27,16 @@ public class TaskWorker {
 	public void startTask(long interval){
 
 		if (interval <= 0){
-			System.out.println("Interval is invalid : " + interval);
+			log.error("Interval is invalid : " + interval);
 			throw new IllegalArgumentException();
 		}
-		System.out.println( LocalDateTime.now() + " Start Trade. Plugin = " + TaskManager.getInstance().getTradingTask());
+		log.info("Start Trade. Plugin = " + TaskManager.getInstance().getTradingTask());
 
 		timer = new Timer();
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				System.out.println(LocalDateTime.now() + " Exec tasks." + TaskManager.getInstance().getTradingTask());
+				log.info("Exec tasks." + TaskManager.getInstance().getTradingTask());
 				for (ITradeLogic task : TaskManager.getInstance().getTradingTask() ) {
 					task.exec();
 				}
@@ -48,7 +49,7 @@ public class TaskWorker {
 		for (ITradeLogic task : TaskManager.getInstance().getTradingTask() ) {
 			task.stopTask();
 		}
-		System.out.println(LocalDateTime.now() + " End Trade.");
+		log.info("End Trade");
 		postProcess();
 	}
 

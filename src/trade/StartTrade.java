@@ -1,10 +1,9 @@
 package trade;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import ui.HomeUI;
-import trade.exec.CheckRate;
-import trade.exec.CheckTrade;
 import trade.manager.AccountInfo;
+import ui.HomeUI;
 
 import java.io.*;
 
@@ -14,21 +13,21 @@ import java.io.*;
  */
 public class StartTrade {
 
-    private static String OUTPUT_PATH = "./Configuration.json";
+    private static String OUTPUT_PATH = "./configuration/Configuration.json";
+    private static Logger log = Logger.getLogger(StartTrade.class);
 
     public static void main(String[] args) {
 
-        System.out.println("Start trade");
+        log.info("Start Trade");
         initialize();
-
         new HomeUI();
     }
 
     private static void initialize(){
-        System.out.println("Initialize configuration.");
+        log.info("Initialize configuration.");
         String configJSON = readFile();
         if (configJSON == null){
-            System.out.println("Fail to initialize. End.");
+            log.error("Fail to initialize. End.");
             System.exit(0);
         }
         JSONObject config = new JSONObject(configJSON);
@@ -50,10 +49,10 @@ public class StartTrade {
             br.close();
             return data;
         }catch(FileNotFoundException e){
-            System.out.println(e);
+            log.equals(e);
             return null;
         }catch(IOException e){
-            System.out.println(e);
+            log.equals(e);
             return null;
         }
     }

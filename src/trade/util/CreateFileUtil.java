@@ -1,5 +1,6 @@
 package trade.util;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import trade.coin.CoinCheckClient;
@@ -17,6 +18,7 @@ import java.util.List;
 
 public class CreateFileUtil {
 
+	private static Logger log = Logger.getLogger(CreateFileUtil.class);
 	public static void createPriceHistoryCSV() {
 
 		String fileName = "/PriceHistory" + "_" + LocalDateTime.now().toString();
@@ -43,9 +45,9 @@ public class CreateFileUtil {
 					p.println();
 				}
 			}
-			System.out.println("End Output Price History CSV File");
+			log.info("End Output Price History CSV File");
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -68,9 +70,9 @@ public class CreateFileUtil {
 					p.println();
 				}
 			}
-			System.out.println("End Output Price History CSV File");
+			log.info("End Output Price History CSV File");
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 
@@ -100,9 +102,9 @@ public class CreateFileUtil {
 					p.println();
 				}
 			}
-			System.out.println("End Output Rest Order CSV File");
+			log.info("End Output Rest Order CSV File");
 		} catch (IOException e) {
-			e.printStackTrace();
+			log.error(e);
 		}
 	}
 }

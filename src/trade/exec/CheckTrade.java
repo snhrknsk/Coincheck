@@ -1,5 +1,6 @@
 package trade.exec;
 
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import trade.coin.CoinCheckClient;
@@ -18,6 +19,7 @@ import java.util.Set;
  */
 public class CheckTrade implements ITradeLogic{
 
+	private Logger log = Logger.getLogger(this.getClass());
 	private Set<Long> orderSet = new HashSet<>();
 	@Override
 	public void exec() {
@@ -39,10 +41,10 @@ public class CheckTrade implements ITradeLogic{
 						settlement *= -1;
 					}
 					if (entity.execSettlement(settlement)){
-						System.out.println("All order is settled. ID : " + id);
+						log.info("All order is settled. ID : " + id);
 						TradeManager.getInstance().deleteOrder(id);
 					} else {
-						System.out.println("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
+						log.info("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
 					}
 					TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(entity.getRate(), entity.getAmount(), entity.isBuyOrder())
 							.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).logic(entry.getValue().getLogic()).build();

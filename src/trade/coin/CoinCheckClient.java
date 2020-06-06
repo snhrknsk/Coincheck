@@ -7,6 +7,7 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import trade.manager.AccountInfo;
 import trade.util.Util;
@@ -23,6 +24,8 @@ public class CoinCheckClient {
     private enum REQUEST_TYPE {
         GET, GET_AUTH, POST, POST_AUTH, DELETE, DELETE_AUTH
     }
+
+    private static Logger log = Logger.getLogger(CoinCheckClient.class);
 
     private static HttpUriRequest createRequest(REQUEST_TYPE type, String uri, String params)  throws IOException{
 
@@ -84,12 +87,13 @@ public class CoinCheckClient {
             int status = response.getStatusLine().getStatusCode();
             if (status == HttpStatus.SC_OK) {
                 responseData = EntityUtils.toString(response.getEntity(), charset);
+                log.debug(responseData);
             } else {
                 String error = EntityUtils.toString(response.getEntity(), charset);
-                System.err.println(error);
+                log.error(error);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error(e);
             responseData = "";
         } finally {
             try {
@@ -100,7 +104,7 @@ public class CoinCheckClient {
                     httpclient.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                log.error(e);
             }
         }
         return responseData;

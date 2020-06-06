@@ -1,5 +1,6 @@
 package trade.manager;
 
+import org.apache.log4j.Logger;
 import trade.exec.*;
 
 import java.util.*;
@@ -10,6 +11,7 @@ import java.util.*;
 public class TaskManager {
 
 	private static volatile long TASK_ID = 0;
+	private static Logger log = Logger.getLogger(TaskManager.class);
 
 	public enum LOGIC_SET{
 		TradeSimple{
@@ -66,9 +68,11 @@ public class TaskManager {
 	 * Remove specified task from task list.
 	 */
 	public synchronized boolean stopTask(String cancelTaskName) {
-		tradingTaskMap.remove(cancelTaskName);
-		System.out.println("Task Class Not Found in Task List : " + cancelTaskName);
-		return false;
+		if (tradingTaskMap.remove(cancelTaskName) == null) {
+			log.info("Task Class Not Found in Task List : " + cancelTaskName);
+			return false;
+		}
+		return true;
 	}
 
 	/**

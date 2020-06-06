@@ -1,5 +1,6 @@
 package trade.exec;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import trade.coin.CoinCheckClient;
 import trade.coin.PARAM_KEY;
@@ -19,6 +20,7 @@ import java.util.TreeMap;
 public class TradeSimple implements  ITradeLogic{
 
 	private static long TASK_ID = 0;
+	private Logger log = Logger.getLogger(this.getClass().getName() + "#" + TASK_ID);
 
 	private long taskID = 0;
 	private double INITIAL_FUND = 8000;
@@ -68,7 +70,7 @@ public class TradeSimple implements  ITradeLogic{
 	@Override
 	public synchronized boolean setParams(Map<String, String> params) {
 
-		System.out.println("Set params to TradeSimple logic : " + params);
+		log.info("Set params to TradeSimple logic : " + params);
 		try {
 			INITIAL_FUND = Double.valueOf(params.get("INITIAL_FUND"));
 			FIRST_BUY = Double.valueOf(params.get("FIRST_BUY"));
@@ -82,7 +84,7 @@ public class TradeSimple implements  ITradeLogic{
 				resetTrade(prevOrderId);
 			}
 		} catch (NumberFormatException e){
-			e.printStackTrace();
+			log.error(e);
 			return false;
 		}
 		return true;
@@ -104,7 +106,7 @@ public class TradeSimple implements  ITradeLogic{
 		if (!prevOrderId.equals("0") && TradeManager.getInstance().getOrder(prevOrderId) != null) {
 			resetTrade(prevOrderId);
 		} else {
-			System.out.println("There is no active order. Previous order ID is " + prevOrderId );
+			log.warn("There is no active order. Previous order ID is " + prevOrderId);
 		}
 		return true;
 	}
@@ -115,14 +117,14 @@ public class TradeSimple implements  ITradeLogic{
 			String result =CoinCheckClient.postOrderCancel(orderId);
 			JSONObject resultObject = new JSONObject(result);
 			if (!resultObject.getBoolean(PARAM_KEY.success.name())){
-				System.out.println(result);
+				log.warn(result);
 				return false;
 			}
 			TradeManager.getInstance().deleteOrder(orderId);
-			System.out.println("The order is canceled. ID = " + resultObject.getLong(PARAM_KEY.id.name()));
+			log.info("The order is canceled. ID = " + resultObject.getLong(PARAM_KEY.id.name()));
 			return true;
 		}
-		System.out.println("Last order is BUY. So, current sell order is not cancel;");
+		log.warn("Last order is BUY. So, current sell order is not cancel");
 		return true;
 	}
 
@@ -157,12 +159,12 @@ public class TradeSimple implements  ITradeLogic{
 
 	private synchronized void postTrade(String result){
 		if (result.isEmpty()){
-			System.out.println("TradeSimple.class Fail to post trade request.");
+			log.warn("Fail to post trade request.");
 			return;
 		}
 		JSONObject resultJSON = new JSONObject(result);
 		if (!resultJSON.getBoolean(PARAM_KEY.success.name())){
-			System.out.println(result);
+			log.warn(result);
 			return;
 		}
 		String id = String.valueOf(resultJSON.getLong(PARAM_KEY.id.name()));
@@ -175,14 +177,14 @@ public class TradeSimple implements  ITradeLogic{
 		} else if ("sell".equals(orderType)) {
 			isLastTradeBuy = false;
 		} else {
-			System.out.println("Order is not correct. Order type is not buy or sell");
+			log.error("Order is not correct. Order type is not buy or sell");
 			return;
 		}
 		TradeManager.getInstance().addOrder(resultJSON, toString());
 		prevOrderId = id;
 		lastTradePrice = Double.valueOf(rate);
 		lastTradeAmount = Double.valueOf(amount);
-		System.out.println(" Exec Post Order ID : " + id + " Order Type : " + orderType + " RATE : " + rate + " Amount" + amount + " DATE : " + date);
+		log.info(" Exec Post Order ID : " + id + " Order Type : " + orderType + " RATE : " + rate + " Amount" + amount + " DATE : " + date);
 	}
 
 	@Override
