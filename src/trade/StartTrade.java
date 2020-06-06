@@ -1,9 +1,12 @@
 package trade;
 
+import org.json.JSONObject;
 import ui.HomeUI;
 import trade.exec.CheckRate;
 import trade.exec.CheckTrade;
 import trade.manager.AccountInfo;
+
+import java.io.*;
 
 /**
  * Coincheck official API<br>
@@ -11,20 +14,47 @@ import trade.manager.AccountInfo;
  */
 public class StartTrade {
 
+    private static String OUTPUT_PATH = "./Configuration.json";
+
     public static void main(String[] args) {
 
-        if (args.length != 2){
-            System.out.println("Invalid argument. Size : " + args.length + " Need access and security keys.");
-            return;
-        }
-        System.out.println("start trade");
-        initialize(args[0], args[1]);
+        System.out.println("Start trade");
+        initialize();
 
         new HomeUI();
     }
 
-    public static void initialize(String access, String secret){
-        AccountInfo.getInstance().setAccessKey(access);
-        AccountInfo.getInstance().setSecretKey(secret);
+    private static void initialize(){
+        System.out.println("Initialize configuration.");
+        String configJSON = readFile();
+        if (configJSON == null){
+            System.out.println("Fail to initialize. End.");
+            System.exit(0);
+        }
+        JSONObject config = new JSONObject(configJSON);
+        AccountInfo.getInstance().setAccessKey(config.getString("access-key"));
+        AccountInfo.getInstance().setSecretKey(config.getString("security-key"));
+        AccountInfo.getInstance().setOutputFilePath(config.getString("file-path"));
+    }
+
+    private static String readFile(){
+        try{
+            File file = new File(OUTPUT_PATH);
+            BufferedReader br = new BufferedReader(new FileReader(file));
+            String data = "";
+            String str = br.readLine();
+            while(str != null){
+                data += str;
+                str = br.readLine();
+            }
+            br.close();
+            return data;
+        }catch(FileNotFoundException e){
+            System.out.println(e);
+            return null;
+        }catch(IOException e){
+            System.out.println(e);
+            return null;
+        }
     }
 }

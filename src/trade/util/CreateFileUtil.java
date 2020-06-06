@@ -20,7 +20,7 @@ public class CreateFileUtil {
 	public static void createPriceHistoryCSV() {
 
 		String fileName = "/PriceHistory" + "_" + LocalDateTime.now().toString();
-		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() +fileName, false)){
+		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() + fileName, false)){
 			try(PrintWriter p = new PrintWriter(new BufferedWriter(f))) {
 				// set header
 				String header = "Data,Price,UP";
