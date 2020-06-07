@@ -78,6 +78,7 @@ public class TradeManager {
 		private double rate;
 		private double orderAmount;
 		private double amount;
+		private double funds;
 		private String date;
 		private String logic;
 
@@ -88,15 +89,13 @@ public class TradeManager {
 			this.isBuyOrder = isBuyOrder;
 			this.date = date;
 			this.logic = algorithm;
+			this.funds = this.rate * this.amount;
 		}
 
-		public double getAmount() {
-			return amount;
-		}
+		public double getAmount() { return amount; }
 		public double getOrderAmount() { return orderAmount; }
-		public double getRate() {
-			return rate;
-		}
+		public double getFunds() { return funds; }
+		public double getRate() { return rate; }
 		public boolean isBuyOrder() { return isBuyOrder; };
 		public String getDate(){ return date; }
 		public String getLogic() { return logic; }
@@ -125,6 +124,7 @@ public class TradeManager {
 		private String tradeId = "";
 		private String date = "";
 		private String logic = "";
+		private double tradedFund = 0;
 
 		TradedOrderEntity(Builder builder){
 			isBuyOrder = builder.isBuyOrder;
@@ -133,6 +133,7 @@ public class TradeManager {
 			orderId = builder.orderId;
 			tradeId = builder.tradeId;
 			date = builder.date;
+			tradedFund = amount * rate;
 		}
 		public double getAmount() {
 			return amount;
@@ -140,6 +141,7 @@ public class TradeManager {
 		public double getRate() {
 			return rate;
 		}
+		public double getTradedFund() { return tradedFund; }
 		public boolean isBuyOrder(){ return isBuyOrder; }
 		public String getOrderId(){ return orderId; }
 		public String getTradeId(){ return tradeId; }

@@ -83,7 +83,7 @@ public class TradeOriginal implements ITradeLogic{
 		} else {
 			isLastTradeBuy = false;
 		}
-		TradeManager.getInstance().addOrder(resultJSON);
+		TradeManager.getInstance().addOrder(resultJSON, toString());
 		prevOrderId = id;
 		lastTradePrice = Double.valueOf(rate);
 		lastTradeAmount = Double.valueOf(amount);

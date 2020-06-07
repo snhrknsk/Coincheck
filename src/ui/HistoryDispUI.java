@@ -38,7 +38,7 @@ public class HistoryDispUI implements ITabComponent{
 		JLabel tradeHistory = new JLabel("取引履歴");
 		tradeHistory.setAlignmentX(Component.CENTER_ALIGNMENT);
 		tradeHistoryPanel.add(tradeHistory);
-		String[] columnTradeHistoryNames = {"ID","取引ID", "日時", "売買", "レート", "量", "アルゴリズム"};
+		String[] columnTradeHistoryNames = {"ID","取引ID", "日時", "売買", "レート", "量", "金額", "アルゴリズム"};
 		tradeHistoryTableModel = new DefaultTableModel(columnTradeHistoryNames, 0) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return false;
@@ -78,7 +78,7 @@ public class HistoryDispUI implements ITabComponent{
 		JLabel order = new JLabel("現在注文");
 		order.setAlignmentX(Component.CENTER_ALIGNMENT);
 		orderPanel.add(order);
-		String[] columnCurrentOrderNames = {"ID", "日時", "売買", "レート", "量", "アルゴリズム"};
+		String[] columnCurrentOrderNames = {"ID", "日時", "売買", "レート", "量", "金額", "アルゴリズム"};
 		currentOrderTableModel = new DefaultTableModel(columnCurrentOrderNames, 0) {
 			@Override public boolean isCellEditable(int row, int column) {
 				return false;
@@ -115,7 +115,7 @@ public class HistoryDispUI implements ITabComponent{
 		for (ListIterator<TradeManager.TradedOrderEntity> it = tradedEntity.listIterator(tradedEntity.size()); it.hasPrevious() ;){
 			TradeManager.TradedOrderEntity entity = it.previous();
 			String buySell = entity.isBuyOrder() ? "買い" : "売り" ;
-			tradeHistoryTableModel.addRow(new String[]{entity.getOrderId(), entity.getTradeId(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), entity.getLogic()});
+			tradeHistoryTableModel.addRow(new String[]{entity.getOrderId(), entity.getTradeId(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), String.valueOf(entity.getTradedFund()), entity.getLogic()});
 		}
 	}
 
@@ -141,7 +141,7 @@ public class HistoryDispUI implements ITabComponent{
 		for (Map.Entry<String, TradeManager.TradeEntity> element: orderMap.entrySet()) {
 			TradeManager.TradeEntity entity = element.getValue();
 			String buySell = entity.isBuyOrder() ? "買い" : "売り" ;
-			currentOrderTableModel.addRow(new String[]{element.getKey(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), entity.getLogic()});
+			currentOrderTableModel.addRow(new String[]{element.getKey(), entity.getDate(), buySell, String.valueOf(entity.getRate()), String.valueOf(entity.getAmount()), String.valueOf(entity.getFunds()), entity.getLogic()});
 		}
 	}
 

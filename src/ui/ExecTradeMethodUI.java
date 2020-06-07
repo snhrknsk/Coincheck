@@ -1,9 +1,8 @@
 package ui;
 
+import org.apache.log4j.Logger;
 import trade.exec.ITradeLogic;
 import trade.manager.TaskManager;
-import trade.manager.TradeManager;
-
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
@@ -16,10 +15,10 @@ import java.awt.event.ItemListener;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 	private final String title = "アルゴリズム";
+	private Logger log = Logger.getLogger(ExecTradeMethodUI.class);
 	private DefaultTableModel currentExecTableModel = null;
 	private JComboBox<ITradeLogic> logicList = null;
 	private DefaultTableModel paramTableModel = null;
@@ -163,7 +162,7 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 			paramTableModel.setNumRows(0);
 			return;
 		}
-		System.out.println("Update Parameter : " + logic.getParams());
+		log.info("Update Parameter : " + logic.getParams());
 		paramTableModel.setNumRows(0);
 		currentSelectedLogic = logic;
 		Map<String, String> params = logic.getParams();

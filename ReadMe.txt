@@ -7,5 +7,7 @@ Logic code:
 create your logic code to package trade.exec
 
 Start:
-Run StartTrade with your api access key and security key in command argument
--> java -jar CoinCheck.jar <Access Key> <Secret Key>
+Run StartTrade
+
+Configuration:
+Set your access key and security key in <program directory>/configuration/Configuration.json
