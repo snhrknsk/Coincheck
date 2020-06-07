@@ -30,6 +30,6 @@ public enum PARAM_KEY {
 	/**getString */
 	btc,
 	/**getString */
-	email
+	email,
 	;
 }

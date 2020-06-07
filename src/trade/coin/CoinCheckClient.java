@@ -158,7 +158,7 @@ public class CoinCheckClient {
         return result;
     }
 
-    public static String postOpenOrder(){
+    public static String getOpenOrder(){
         String uri = TRADE_API.open.getUrl();
         String result = postRequest(REQUEST_TYPE.GET_AUTH, uri, "");
         return result;
