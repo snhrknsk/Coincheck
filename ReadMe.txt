@@ -4,7 +4,7 @@ apache http client/core(https://hc.apache.org/downloads.cgi)
 apache log4j (https://logging.apache.org/log4j/2.x/download.html)
 
 Logic code:
-create your logic code to package trade.exec
+create your logic code to package trade.exec and add LOGIC_SET defined in TaskManager class
 
 Start:
 Run StartTrade

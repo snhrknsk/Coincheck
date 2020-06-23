@@ -5,6 +5,7 @@ import org.apache.log4j.Logger;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLEncoder;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -13,7 +14,15 @@ import java.util.Map;
 public class Util {
 
     private static Logger log = Logger.getLogger(Util.class);
-    public Util() {
+
+    /**
+     * Round double value. 5 digits after the decimal point(Half Up)
+     * @param target
+     * @return round value
+     */
+    public static String roundForAmount(double target){
+        BigDecimal result = new BigDecimal(target).setScale(5, BigDecimal.ROUND_HALF_UP);
+        return result.toString();
     }
 
     public static String createHmacSha256(String message, String secretKey) {
