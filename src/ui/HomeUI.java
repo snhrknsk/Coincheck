@@ -48,7 +48,6 @@ public class HomeUI extends JFrame implements ActionListener {
 		setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
 		panel.setLayout(new FlowLayout());
-		Insets insets = new Insets(3, 5, 1, 1);
 
 		JSONObject current = new JSONObject(CoinCheckClient.getCurrentPrice());
 		String price = current.getString(PARAM_KEY.rate.name());
@@ -88,7 +87,7 @@ public class HomeUI extends JFrame implements ActionListener {
 			isStarted = !isStarted;
 			startStopTrade(isStarted);
 		} else if (command.equals(Action.update.name())) {
-			currentPrice.setText(String.valueOf(CoinManager.getInstance().getCurrentRate()));
+			currentPrice.setText("現在価格 : " + String.valueOf(CoinManager.getInstance().getCurrentRate()));
 			for (ITabComponent component: tabInstanceList) {
 				component.updateComponent();
 			}
@@ -108,7 +107,7 @@ public class HomeUI extends JFrame implements ActionListener {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				currentPrice.setText(String.valueOf(CoinManager.getInstance().getCurrentRate()));
+				currentPrice.setText("現在価格 : " + String.valueOf(CoinManager.getInstance().getCurrentRate()));
 				for (ITabComponent component: tabInstanceList) {
 					component.updateByConstantInterval();
 				}

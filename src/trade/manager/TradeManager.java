@@ -134,6 +134,7 @@ public class TradeManager {
 			tradeId = builder.tradeId;
 			date = builder.date;
 			tradedFund = amount * rate;
+			logic = builder.logic;
 		}
 		public double getAmount() {
 			return amount;
