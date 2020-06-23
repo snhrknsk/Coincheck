@@ -5,6 +5,7 @@ import org.json.JSONObject;
 import trade.manager.AccountInfo;
 import ui.HomeUI;
 
+import javax.swing.*;
 import java.io.*;
 
 /**
@@ -13,14 +14,14 @@ import java.io.*;
  */
 public class StartTrade {
 
-    private static String OUTPUT_PATH = "./configuration/Configuration.json";
-    private static Logger log = Logger.getLogger(StartTrade.class);
+    private static final String OUTPUT_PATH = "./configuration/Configuration.json";
+    private static final Logger log = Logger.getLogger(StartTrade.class);
 
     public static void main(String[] args) {
 
         log.info("Start Trade");
         initialize();
-        new HomeUI();
+        SwingUtilities.invokeLater(HomeUI::new);
     }
 
     private static void initialize(){
@@ -40,19 +41,16 @@ public class StartTrade {
         try{
             File file = new File(OUTPUT_PATH);
             BufferedReader br = new BufferedReader(new FileReader(file));
-            String data = "";
+            StringBuilder data = new StringBuilder();
             String str = br.readLine();
             while(str != null){
-                data += str;
+                data.append(str);
                 str = br.readLine();
             }
             br.close();
-            return data;
-        }catch(FileNotFoundException e){
-            log.equals(e);
-            return null;
-        }catch(IOException e){
-            log.equals(e);
+            return data.toString();
+        } catch(IOException e){
+            log.error(e);
             return null;
         }
     }
