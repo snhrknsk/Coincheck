@@ -18,7 +18,7 @@ import java.util.List;
 
 public class CreateFileUtil {
 
-	private static Logger log = Logger.getLogger(CreateFileUtil.class);
+	private static final Logger log = Logger.getLogger(CreateFileUtil.class);
 	public static void createPriceHistoryCSV() {
 
 		String fileName = "/PriceHistory" + "_" + LocalDateTime.now().toString();
@@ -34,14 +34,14 @@ public class CreateFileUtil {
 				for (CoinManager.PriceEntity element : priceHistory) {
 					p.print(element.date + ",");
 					p.print(element.rate);
-					if (Double.valueOf(element.rate) > preVal) {
+					if (Double.parseDouble(element.rate) > preVal) {
 						p.print(",↑");
-					} else if (Double.valueOf(element.rate) < preVal) {
+					} else if (Double.parseDouble(element.rate) < preVal) {
 						p.print(",↓");
 					} else {
 						p.print(",=");
 					}
-					preVal = Double.valueOf(element.rate);
+					preVal = Double.parseDouble(element.rate);
 					p.println();
 				}
 			}
@@ -77,7 +77,7 @@ public class CreateFileUtil {
 	}
 
 	public static void createOpenOrder(){
-		String result = CoinCheckClient.postOpenOrder();
+		String result = CoinCheckClient.getOpenOrder();
 		if (result.isEmpty()){
 			System.out.println("All order is settled. No rest order.");
 			return;
