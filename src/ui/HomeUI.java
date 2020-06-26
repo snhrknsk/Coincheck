@@ -87,7 +87,7 @@ public class HomeUI extends JFrame implements ActionListener {
 			isStarted = !isStarted;
 			startStopTrade(isStarted);
 		} else if (command.equals(Action.update.name())) {
-			currentPrice.setText("現在価格 : " + String.valueOf(CoinManager.getInstance().getCurrentRate()));
+			currentPrice.setText("現在価格 : " + CoinManager.getInstance().getCurrentRate());
 			for (ITabComponent component: tabInstanceList) {
 				component.updateComponent();
 			}
@@ -107,7 +107,7 @@ public class HomeUI extends JFrame implements ActionListener {
 		timer.schedule(new TimerTask() {
 			@Override
 			public void run() {
-				currentPrice.setText("現在価格 : " + String.valueOf(CoinManager.getInstance().getCurrentRate()));
+				currentPrice.setText("現在価格 : " + CoinManager.getInstance().getCurrentRate());
 				for (ITabComponent component: tabInstanceList) {
 					component.updateByConstantInterval();
 				}

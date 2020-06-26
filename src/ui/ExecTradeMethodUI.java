@@ -17,23 +17,24 @@ import java.util.List;
 import java.util.Map;
 
 public class ExecTradeMethodUI implements ITabComponent, ActionListener {
-	private final String title = "アルゴリズム";
 	private Logger log = Logger.getLogger(ExecTradeMethodUI.class);
 	private DefaultTableModel currentExecTableModel = null;
 	private JComboBox<ITradeLogic> logicList = null;
 	private DefaultTableModel paramTableModel = null;
 	private JTable paramTable = null;
+	private JTable currentExecTable = null;
 	private JButton updateButton = null;
+	private JButton deleteButton = null;
 
 	private boolean isExistingLogicSelected = false;
 	private ITradeLogic currentSelectedLogic = null;
 	private boolean completeInitialize = false;
 
-	private enum Action{update}
+	private enum Action{update, delete}
 
 	@Override
 	public String getTabName() {
-		return title;
+		return "アルゴリズム";
 	}
 
 	@Override
@@ -42,11 +43,16 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 		panel.setLayout(new BoxLayout(panel, BoxLayout.X_AXIS));
 		//LEFT side : current exec logic list
 		JPanel currentExecPanel = new JPanel();
-		currentExecPanel.setLayout(new BoxLayout(currentExecPanel, BoxLayout.Y_AXIS));
+		currentExecPanel.setLayout(new BorderLayout());
 		currentExecPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
+		//current exec logic
+		JPanel currentAlgorithmPanel = new JPanel();
+		currentAlgorithmPanel.setLayout(new BoxLayout(currentAlgorithmPanel, BoxLayout.Y_AXIS));
+		currentAlgorithmPanel.setBorder(BorderFactory.createEmptyBorder(5, 5, 5, 5));
 		JLabel label = new JLabel("現在設定");
 		label.setAlignmentX(Component.CENTER_ALIGNMENT);
-		currentExecPanel.add(label);
+		currentAlgorithmPanel.add(label);
+
 		currentExecTableModel = new DefaultTableModel();
 		String[] columnTradeHistoryNames = {"実行中のアルゴリズム"};
 		currentExecTableModel = new DefaultTableModel(columnTradeHistoryNames, 0) {
@@ -54,7 +60,7 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 				return false;
 			}
 		};
-		JTable currentExecTable = new JTable(currentExecTableModel);
+		currentExecTable = new JTable(currentExecTableModel);
 		currentExecTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		currentExecTable.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 			@Override public void valueChanged(ListSelectionEvent e) {
@@ -72,11 +78,18 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 					logicList.setSelectedIndex(-1);
 					isExistingLogicSelected = true;
 					updateButton.setText("更新");
+					deleteButton.setEnabled(true);
 				}
 			}
 		});
 		JScrollPane scrollPanel = new JScrollPane(currentExecTable);
-		currentExecPanel.add(scrollPanel);
+		currentAlgorithmPanel.add(scrollPanel);
+		currentExecPanel.add("Center", currentAlgorithmPanel);
+		deleteButton = new JButton("削除");
+		deleteButton.addActionListener(this);
+		deleteButton.setActionCommand(Action.delete.name());
+		deleteButton.setEnabled(false);
+		currentExecPanel.add("South", deleteButton);
 		panel.add(currentExecPanel);
 		updateCurrentLogic();
 
@@ -104,6 +117,7 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 					currentExecTable.clearSelection();
 					isExistingLogicSelected = false;
 					updateButton.setText("追加");
+					deleteButton.setEnabled(false);
 				}
 			}
 		});
@@ -190,6 +204,9 @@ public class ExecTradeMethodUI implements ITabComponent, ActionListener {
 			updateCurrentLogic();
 			updateParamTable(null);
 			currentSelectedLogic = null;
+		} else if (command.equals(Action.delete.name()) && isExistingLogicSelected && currentSelectedLogic != null) {
+			TaskManager.getInstance().stopTask(currentSelectedLogic.toString());
+			currentExecTableModel.removeRow(currentExecTable.getSelectedRow());
 		}
 	}
 

@@ -26,6 +26,12 @@ public class TaskManager {
 				return new TradeTrend();
 			}
 		},
+		TradeOriginal{
+			@Override
+			public ITradeLogic createInstance() {
+				return new TradeOriginal();
+			}
+		},
 		;
 		private ITradeLogic instance;
 		private LOGIC_SET(){}
@@ -39,7 +45,8 @@ public class TaskManager {
 		//initial run logic
 		tradingTaskMap.put("CheckRate", new CheckRate());
 		tradingTaskMap.put("CheckTrade", new CheckTrade());
-		tradingTaskMap.put("TradeSimple", new TradeSimple());
+		ITradeLogic logic = LOGIC_SET.TradeSimple.createInstance();
+		tradingTaskMap.put(logic.toString(), logic);
 	}
 
 	public synchronized static TaskManager getInstance(){
@@ -68,7 +75,11 @@ public class TaskManager {
 	 * Remove specified task from task list.
 	 */
 	public synchronized boolean stopTask(String cancelTaskName) {
-		if (tradingTaskMap.remove(cancelTaskName) == null) {
+		if (tradingTaskMap.containsKey(cancelTaskName)) {
+			log.info("Stop the task and delete the current exec logic: " + cancelTaskName);
+			tradingTaskMap.get(cancelTaskName).stopTask();
+			tradingTaskMap.remove(cancelTaskName);
+		} else {
 			log.info("Task Class Not Found in Task List : " + cancelTaskName);
 			return false;
 		}
