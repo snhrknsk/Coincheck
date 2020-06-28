@@ -6,6 +6,7 @@ import trade.coin.PARAM_KEY;
 import trade.exec.ITradeLogic;
 import trade.exec.TaskWorker;
 import trade.manager.CoinManager;
+import trade.util.CreateFileUtil;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -13,10 +14,9 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
 
 public class HomeUI extends JFrame implements ActionListener {
 
@@ -25,10 +25,12 @@ public class HomeUI extends JFrame implements ActionListener {
 	}
 
 	private final long INTERVAL = 60000;
+	private final long DUMP_INTERVAL = 86400000; //24 hours
 	private boolean isStarted = false;
 	private JButton startButton = null;
 	private JLabel currentPrice = null;
 	private Timer timer = new Timer();
+	private Timer dumpTimer = new Timer();
 
 	private final TaskWorker taskWorker;
 	private List<ITabComponent> tabInstanceList = new ArrayList<>();
@@ -76,6 +78,9 @@ public class HomeUI extends JFrame implements ActionListener {
 		}
 		add("Center", tabPane);
 		setVisible(true);
+
+		// dump price history file not to consume memory for price cache
+		dumpData();
 	}
 
 	@Override
@@ -113,6 +118,20 @@ public class HomeUI extends JFrame implements ActionListener {
 				}
 			}
 		}, INTERVAL, INTERVAL);
+	}
+
+	private void dumpData(){
+		dumpTimer = new Timer();
+		Date startTime = new Date();
+		startTime.setHours(23);
+		startTime.setMinutes(59);
+		dumpTimer.scheduleAtFixedRate(new TimerTask() {
+			@Override
+			public void run() {
+				CreateFileUtil.createPriceHistoryCSV();
+				CoinManager.getInstance().clearHistory();
+			}
+		}, startTime, DUMP_INTERVAL);
 	}
 
 }

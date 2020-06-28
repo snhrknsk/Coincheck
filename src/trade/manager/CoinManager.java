@@ -1,9 +1,6 @@
 package trade.manager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Singleton class<br>
@@ -45,6 +42,10 @@ public class CoinManager {
 	public static class PriceEntity{
 		public String date = "";
 		public String rate = "";
+	}
+
+	public void clearHistory(){
+		rateList.clear();
 	}
 
 }
