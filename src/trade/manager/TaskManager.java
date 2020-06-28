@@ -2,6 +2,7 @@ package trade.manager;
 
 import org.apache.log4j.Logger;
 import trade.exec.*;
+import ui.ITabComponent;
 
 import java.util.*;
 
@@ -12,6 +13,9 @@ public class TaskManager {
 
 	private static volatile long TASK_ID = 0;
 	private static Logger log = Logger.getLogger(TaskManager.class);
+	long start = 0;
+
+	private Timer dumpTimer = new Timer();
 
 	public enum LOGIC_SET{
 		TradeSimple{
@@ -99,9 +103,8 @@ public class TaskManager {
 	 * @return new task name(class name + No[incremented])
 	 */
 	public synchronized String startNewTask(ITradeLogic startTask) {
-		tradingTaskMap.put(startTask + "#" + TASK_ID++, startTask);
+		log.info("Add new Task : " + startTask);
+		tradingTaskMap.put(startTask.toString() , startTask);
 		return startTask.getLogicName();
 	}
-
-
 }
