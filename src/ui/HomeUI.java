@@ -1,6 +1,8 @@
 package ui;
 
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
+import trade.StartTrade;
 import trade.coin.CoinCheckClient;
 import trade.coin.PARAM_KEY;
 import trade.exec.ITradeLogic;
@@ -23,6 +25,8 @@ public class HomeUI extends JFrame implements ActionListener {
 	private enum Action{
 		startStop,update
 	}
+
+	private static final Logger log = Logger.getLogger(HomeUI.class);
 
 	private final long INTERVAL = 60000;
 	private final long DUMP_INTERVAL = 86400000; //24 hours
@@ -78,9 +82,6 @@ public class HomeUI extends JFrame implements ActionListener {
 		}
 		add("Center", tabPane);
 		setVisible(true);
-
-		// dump price history file not to consume memory for price cache
-		dumpData();
 	}
 
 	@Override
@@ -102,8 +103,11 @@ public class HomeUI extends JFrame implements ActionListener {
 	private void startStopTrade(boolean isStarted){
 		if (isStarted){
 			taskWorker.startTask(INTERVAL);
+			// dump price history file not to consume memory for price cache
+			dumpData();
 		} else {
 			taskWorker.stopAllTask();
+			dumpTimer.cancel();
 		}
 	}
 
@@ -128,6 +132,7 @@ public class HomeUI extends JFrame implements ActionListener {
 		dumpTimer.scheduleAtFixedRate(new TimerTask() {
 			@Override
 			public void run() {
+				log.info("Dump the price history.");
 				CreateFileUtil.createPriceHistoryCSV();
 				CoinManager.getInstance().clearHistory();
 			}
