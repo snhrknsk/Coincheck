@@ -141,6 +141,16 @@ public class CoinCheckClient {
         return result;
     }
 
+    public static String postMarketBuyRequest(String amountJPY) {
+        String uri = TRADE_API.market_buy.getUrl();
+        JSONObject orderObj = new JSONObject();
+        orderObj.put(PARAM_KEY.market_buy_amount.name(), amountJPY);
+        orderObj.put(PARAM_KEY.order_type.name(), PARAM_KEY.market_buy.name());
+        orderObj.put(PARAM_KEY.pair.name(), COIN.BITCOIN.getCoinPair());
+        String result = postRequest(REQUEST_TYPE.POST_AUTH, uri, orderObj.toString());
+        return result;
+    }
+
     public  static String postSellRequest(String rate, String amount){
         String uri = TRADE_API.buy.getUrl();
         JSONObject orderObj = new JSONObject();
@@ -148,6 +158,16 @@ public class CoinCheckClient {
         orderObj.put("amount", amount);
         orderObj.put("order_type", "sell");
         orderObj.put("pair", COIN.BITCOIN.getCoinPair());
+        String result = postRequest(REQUEST_TYPE.POST_AUTH, uri, orderObj.toString());
+        return result;
+    }
+
+    public static String postMarketSellRequest(String amountCoin){
+        String uri = TRADE_API.market_sell.getUrl();
+        JSONObject orderObj = new JSONObject();
+        orderObj.put(PARAM_KEY.amount.name(), amountCoin);
+        orderObj.put(PARAM_KEY.order_type.name(), PARAM_KEY.market_sell.name());
+        orderObj.put(PARAM_KEY.pair.name(), COIN.BITCOIN.getCoinPair());
         String result = postRequest(REQUEST_TYPE.POST_AUTH, uri, orderObj.toString());
         return result;
     }

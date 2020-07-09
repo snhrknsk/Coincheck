@@ -12,6 +12,9 @@ public enum PARAM_KEY {
 	order_type,
 	pair,
 	//REQUEST
+	market_buy_amount,
+	market_buy,
+	market_sell,
 	//RESPONSE
 	/**getBoolean */
 	success,
