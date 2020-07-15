@@ -10,10 +10,14 @@ public enum PARAM_KEY {
 	amount,
 	/**getString */
 	order_type,
+	/**getString */
 	pair,
 	//REQUEST
+	/**getString */
 	market_buy_amount,
+	/**getString */
 	market_buy,
+	/**getString */
 	market_sell,
 	//RESPONSE
 	/**getBoolean */
