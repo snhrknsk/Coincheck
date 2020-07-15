@@ -17,7 +17,7 @@ public enum PARAM_KEY {
 	market_buy_amount,
 	/**getString */
 	market_buy,
-	/**getString*/
+	/**getString */
 	market_sell,
 	//RESPONSE
 	/**getBoolean */
