@@ -10,7 +10,7 @@ public enum PARAM_KEY {
 	amount,
 	/**getString */
 	order_type,
-	/**getString */
+	/**getString*/
 	pair,
 	//REQUEST
 	/**getString */
