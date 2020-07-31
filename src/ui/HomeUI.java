@@ -30,6 +30,7 @@ public class HomeUI extends JFrame implements ActionListener {
 
 	private final long INTERVAL = 60000;
 	private final long DUMP_INTERVAL = 86400000; //24 hours
+	private final String ICON_PATH = ".\\Configuration\\icon\\icon.png";
 	private boolean isStarted = false;
 	private JButton startButton = null;
 	private JLabel currentPrice = null;
@@ -50,6 +51,9 @@ public class HomeUI extends JFrame implements ActionListener {
 		setTitle("勝手に取引マン");
 		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		setLocationRelativeTo(null);
+
+		ImageIcon icon = new ImageIcon(ICON_PATH);
+		setIconImage(icon.getImage());
 
 		setLayout(new BorderLayout());
 		JPanel panel = new JPanel();
