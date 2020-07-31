@@ -31,39 +31,44 @@ public class CheckTrade implements ITradeLogic{
 		String openOrderResult = CoinCheckClient.getOpenOrder();
 		JSONObject openOrders = new JSONObject(openOrderResult);
 		Map<String, TradeManager.TradeEntity> orderMap = TradeManager.getInstance().getAllOrder();
-		for (Map.Entry<String, TradeManager.TradeEntity> entry: orderMap.entrySet()) {
-			String id = entry.getKey();
-			JSONArray tradeHistory = histories.getJSONArray(PARAM_KEY.data.name());
-			for (int i = 0; i < tradeHistory.length(); i++) {
-				JSONObject target = tradeHistory.getJSONObject(i);
-				if (String.valueOf(target.getLong(PARAM_KEY.order_id.name())).equals(id) && !orderSet.contains(target.getLong(PARAM_KEY.id.name()))){
-					// order amount - settlement amount. All order amount is settled, its order is deleted from TradeManager
-					TradeManager.TradeEntity entity = entry.getValue();
-					JSONObject funds = target.getJSONObject(PARAM_KEY.funds.name());
-					double settlement = Double.valueOf(funds.getString(PARAM_KEY.btc.name()));
-					if (settlement < 0) {
-						settlement *= -1;
-					}
-					if (entity.execSettlement(settlement)){
-						log.info("All order is settled. ID : " + id);
-						TradeManager.getInstance().deleteOrder(id);
-					} else {
-						//double check if settle is not 0, but open order doesn't exist
-						//sometimes a part of order is remained in spite of order completed.
-						if (!checkOpenOrder(id, openOrders)){
+		//FixMe : Sometimes this for loop makes exception "ConcurrentModificationException"
+		try {
+			for (Map.Entry<String, TradeManager.TradeEntity> entry : orderMap.entrySet()) {
+				String id = entry.getKey();
+				JSONArray tradeHistory = histories.getJSONArray(PARAM_KEY.data.name());
+				for (int i = 0; i < tradeHistory.length(); i++) {
+					JSONObject target = tradeHistory.getJSONObject(i);
+					if (String.valueOf(target.getLong(PARAM_KEY.order_id.name())).equals(id) && !orderSet.contains(target.getLong(PARAM_KEY.id.name()))) {
+						// order amount - settlement amount. All order amount is settled, its order is deleted from TradeManager
+						TradeManager.TradeEntity entity = entry.getValue();
+						JSONObject funds = target.getJSONObject(PARAM_KEY.funds.name());
+						double settlement = Double.valueOf(funds.getString(PARAM_KEY.btc.name()));
+						if (settlement < 0) {
+							settlement *= -1;
+						}
+						if (entity.execSettlement(settlement)) {
 							log.info("All order is settled. ID : " + id);
-							log.warn("Order is completed, but remain settle amount in system. ID : " + id + " amount :" + entity.getAmount());
 							TradeManager.getInstance().deleteOrder(id);
 						} else {
-							log.info("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
+							//double check if settle is not 0, but open order doesn't exist
+							//sometimes a part of order is remained in spite of order completed.
+							if (!checkOpenOrder(id, openOrders)) {
+								log.info("All order is settled. ID : " + id);
+								log.warn("Order is completed, but remain settle amount in system. ID : " + id + " amount :" + entity.getAmount());
+								TradeManager.getInstance().deleteOrder(id);
+							} else {
+								log.info("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
+							}
 						}
+						TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(entity.getRate(), entity.getOrderAmount(), entity.isBuyOrder())
+								.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).logic(entry.getValue().getLogic()).build();
+						TradeManager.getInstance().completeTrade(tradedEntity);
+						orderSet.add(target.getLong(PARAM_KEY.id.name()));
 					}
-					TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(entity.getRate(), entity.getOrderAmount(), entity.isBuyOrder())
-							.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).logic(entry.getValue().getLogic()).build();
-					TradeManager.getInstance().completeTrade(tradedEntity);
-					orderSet.add(target.getLong(PARAM_KEY.id.name()));
 				}
 			}
+		}catch(Exception e){
+			log.error(e);
 		}
 	}
 
