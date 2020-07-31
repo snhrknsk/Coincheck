@@ -21,7 +21,7 @@ public class CreateFileUtil {
 	private static final Logger log = Logger.getLogger(CreateFileUtil.class);
 	public static void createPriceHistoryCSV() {
 
-		String fileName = "/PriceHistory" + "_" + LocalDateTime.now().toString();
+		String fileName = "PriceHistory" + "_" + LocalDateTime.now().toString().replace(":", "") + ".txt";
 		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() + fileName, false)){
 			try(PrintWriter p = new PrintWriter(new BufferedWriter(f))) {
 				// set header
@@ -53,7 +53,7 @@ public class CreateFileUtil {
 
 	public static void createTradeHistory(){
 
-		String fileName = "/TradeHistory" + "_" + LocalDateTime.now().toString();
+		String fileName = "TradeHistory" + "_" + LocalDateTime.now().toString().replace(":", "") + ".txt";
 		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() +fileName, false)){
 			try(PrintWriter p = new PrintWriter(new BufferedWriter(f))) {
 				// set header
@@ -85,7 +85,7 @@ public class CreateFileUtil {
 		JSONObject resultJSON = new JSONObject(result);
 		JSONArray resultArray = resultJSON.getJSONArray(PARAM_KEY.orders.name());
 
-		String fileName = "/RestOrder" + "_" + LocalDateTime.now().toString();
+		String fileName = "RestOrder" + "_" + LocalDateTime.now().toString().replace(":", "") + ".txt";
 		try (FileWriter f = new FileWriter(AccountInfo.getInstance().getOutputFilePath() +fileName, false)){
 			try(PrintWriter p = new PrintWriter(new BufferedWriter(f))) {
 				// set header
