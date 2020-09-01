@@ -43,6 +43,7 @@ public class CheckTrade implements ITradeLogic{
 						TradeManager.TradeEntity entity = entry.getValue();
 						JSONObject funds = target.getJSONObject(PARAM_KEY.funds.name());
 						double settlement = Double.valueOf(funds.getString(PARAM_KEY.btc.name()));
+						double rate = Double.valueOf(target.getString(PARAM_KEY.rate.name()));
 						if (settlement < 0) {
 							settlement *= -1;
 						}
@@ -60,8 +61,7 @@ public class CheckTrade implements ITradeLogic{
 								log.info("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
 							}
 						}
-						double rate = Double.valueOf(target.getString(PARAM_KEY.rate.name()));
-						TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(rate, entity.getOrderAmount(), entity.isBuyOrder())
+						TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(rate, settlement, entity.isBuyOrder())
 								.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).logic(entry.getValue().getLogic()).build();
 						TradeManager.getInstance().completeTrade(tradedEntity);
 						orderSet.add(target.getLong(PARAM_KEY.id.name()));
