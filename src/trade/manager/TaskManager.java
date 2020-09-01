@@ -24,10 +24,10 @@ public class TaskManager {
 				return new TradeSimple();
 			}
 		},
-		TradeTrend{
+		TradeTechnicalIndex{
 			@Override
 			public ITradeLogic createInstance() {
-				return new TradeTrend();
+				return TradeTechIndex.getInstance();
 			}
 		},
 		TradeOriginal{
