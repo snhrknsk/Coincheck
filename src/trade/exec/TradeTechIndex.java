@@ -2,8 +2,6 @@ package trade.exec;
 
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
-import sun.jvm.hotspot.debugger.linux.LinuxDebugger;
-import test.TestTradeXPath;
 import trade.coin.CoinCheckClient;
 import trade.coin.PARAM_KEY;
 import trade.manager.CoinManager;
@@ -15,10 +13,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * https://jp.investing.com/crypto/bitcoin/btc-jpy
@@ -30,6 +25,7 @@ public class TradeTechIndex implements  ITradeLogic{
 	private static long TASK_ID = 0;
 	private Logger log = Logger.getLogger(this.getClass().getName() + "#" + TASK_ID);
 	private static TradeTechIndex instance = null;
+
 	private TradeTechIndex(){
 	}
 	public static synchronized TradeTechIndex getInstance(){
@@ -39,21 +35,20 @@ public class TradeTechIndex implements  ITradeLogic{
 		return instance;
 	}
 
-
 	private enum SIGNAL{
 		s_buy,buy,s_sell,sell,neutral
 	}
 	private long taskID = 0;
 	/* Excecメソッド何回ごとに実行するかを決定
-	 * HTML読み込みが重いので複数回に１回だけ実行する
+	 * HTML読み込みが重いので１回だけ実行する
 	 * 実行するかどうかをuseSummaryで決定
 	 */
 	private enum SUMMARY_CONF{
 		shortInterval(5, false,0, 8000),
-		middleInterval(30, true,1, 8000),
-		longInterval(60, false,2, 8000),
-		dailyInterval(1440, false,3, 8000),
-		monthlyInterval(7200, false,4, 8000),;
+		middleInterval(10, true,1, 8000),
+		longInterval(15, false,2, 8000),
+		dailyInterval(15, true,3, 8000),
+		monthlyInterval(20, false,4, 8000),;
 		private int intervalCount;
 		private boolean useSummary;
 		private int index;
@@ -61,6 +56,7 @@ public class TradeTechIndex implements  ITradeLogic{
 		public boolean prevTradeBuy = false;
 		public String prevOrderId = "";
 		public double lastTradeAmount = 0;
+		public int tradeCount = 0;
 		private SUMMARY_CONF(int intervalCount, boolean useSummary, int index, double fund){
 			this.intervalCount = intervalCount;
 			this.useSummary = useSummary;
@@ -68,10 +64,12 @@ public class TradeTechIndex implements  ITradeLogic{
 			this.fund = fund;
 		}
 		public int getIntervalCount(){return intervalCount;}
+		public void setIntervalCount(int interval) { this.intervalCount = interval; }
 		public boolean isUseSummary(){return useSummary;}
 		public int getIndex(){return index;}
 		public double getFund(){return fund;}
 		public void setFund(double fund){this.fund = fund;}
+		public void setUseSummary(boolean use){this.useSummary = use;}
 	}
 	private final String url = "https://jp.investing.com/crypto/bitcoin/btc-jpy";
 	private final String technical = "<td class=\"left first\">テクニカル指標</td>";
@@ -101,11 +99,15 @@ public class TradeTechIndex implements  ITradeLogic{
 						case s_buy:
 							if (!summary.prevTradeBuy){
 								buy(summary);
+							} else {
+								log.info("Previous trade is BUY. Current tech summary is " + sig + ". Not trade.");
 							}
 							break;
 						case s_sell:
 							if (summary.prevTradeBuy){
 								sell(summary);
+							} else {
+								log.info("Previous trade is SELL. Current tech summary is " + sig + ". Not trade.");
 							}
 							break;
 						default:
@@ -126,6 +128,7 @@ public class TradeTechIndex implements  ITradeLogic{
 		if (postTrade(result)) {
 			summary.prevTradeBuy = false;
 			summary.setFund(Double.parseDouble(Util.roundForAmount(currentPrice * sellAmount)));
+			summary.tradeCount++;
 		}
 	}
 
@@ -139,6 +142,7 @@ public class TradeTechIndex implements  ITradeLogic{
 		if (postTrade(result)){
 			summary.prevTradeBuy = true;
 			summary.lastTradeAmount = Double.parseDouble(amount);
+			summary.tradeCount++;
 		}
 	}
 
@@ -229,16 +233,41 @@ public class TradeTechIndex implements  ITradeLogic{
 
 	@Override
 	public boolean setParams(Map<String, String> params) {
-		return false;
+		for (SUMMARY_CONF conf: SUMMARY_CONF.values()) {
+			String name = conf.name() + ".";
+			conf.setFund(Double.valueOf(params.get(name + "Fund")));
+			conf.setUseSummary(Boolean.valueOf(params.get(name + "Use")));
+			conf.prevTradeBuy = Boolean.valueOf(params.get(name + "PrevBuy"));
+			conf.setIntervalCount(Integer.valueOf(params.get(name + "Interval")));
+		}
+		return true;
 	}
 
 	@Override
 	public Map<String, String> getParams() {
-		return Collections.emptyMap();
+		Map<String, String> paramMap = new LinkedHashMap<>();
+		for (SUMMARY_CONF conf: SUMMARY_CONF.values()) {
+			String name = conf.name() + ".";
+			paramMap.put(name + "Fund", String.valueOf(conf.getFund()));
+			paramMap.put(name + "Use", String.valueOf(conf.isUseSummary()));
+			paramMap.put(name + "PrevBuy", String.valueOf(conf.prevTradeBuy));
+			paramMap.put(name + "Interval", String.valueOf(conf.getIntervalCount()));
+		}
+		return paramMap;
 	}
 
 	@Override
 	public boolean stopTask() {
+		StringBuilder info = new StringBuilder();
+		for (SUMMARY_CONF conf: SUMMARY_CONF.values()) {
+			if (conf.isUseSummary()) {
+				info.append(conf.name());
+				info.append(" : Previous Trade is buy = ");
+				info.append(conf.prevTradeBuy);
+				info.append(", Trade count is " + conf.tradeCount);
+				log.info(info.toString());
+			}
+		}
 		return true;
 	}
 
