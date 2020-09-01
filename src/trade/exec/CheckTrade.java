@@ -60,7 +60,8 @@ public class CheckTrade implements ITradeLogic{
 								log.info("A part of order is remained. Order ID = " + id + " Remain : " + entity.getAmount());
 							}
 						}
-						TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(entity.getRate(), entity.getOrderAmount(), entity.isBuyOrder())
+						double rate = Double.valueOf(target.getString(PARAM_KEY.rate.name()));
+						TradeManager.TradedOrderEntity tradedEntity = new TradeManager.TradedOrderEntity.Builder(rate, entity.getOrderAmount(), entity.isBuyOrder())
 								.date(target.getString(PARAM_KEY.created_at.name())).orderId(String.valueOf(target.getLong(PARAM_KEY.id.name()))).tradeId(id).logic(entry.getValue().getLogic()).build();
 						TradeManager.getInstance().completeTrade(tradedEntity);
 						orderSet.add(target.getLong(PARAM_KEY.id.name()));
