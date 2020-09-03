@@ -37,8 +37,12 @@ public class TaskWorker {
 			@Override
 			public void run() {
 				log.info("Exec tasks." + TaskManager.getInstance().getTradingTask());
-				for (ITradeLogic task : TaskManager.getInstance().getTradingTask() ) {
-					task.exec();
+				try {
+					for (ITradeLogic task : TaskManager.getInstance().getTradingTask()) {
+						task.exec();
+					}
+				}catch (Exception e){
+					log.error(e);
 				}
 			}
 		}, interval, interval);
